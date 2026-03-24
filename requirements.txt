@@ -1,0 +1,7 @@
+numpy
+pandas
+pillow
+tqdm
+torchio
+opencv-python
+tqdm
