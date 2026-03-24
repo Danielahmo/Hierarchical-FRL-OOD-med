@@ -74,6 +74,7 @@ x_F = [x, x_L, x_H]  ──► Encoder ──► z ~ N(μ, σ²) ──► Decod
 ├── train_3DVAE_freq_2gauss_adjustB.py  # Training script for 3D (MOOD)
 ├── OOD_scores.py                   # 2D OOD evaluation (NLL, S_F)
 ├── OOD_3D_scores.py                # 3D OOD evaluation
+├── preprocessing_MRI_CT_scans.py   # 3D preprocessing       
 ├── utils_2D.py                     # 2D frequency utilities
 ├── utils.py                        # 3D frequency utilities
 ├── train_2D.sh                     # Shell script: train 2D model
@@ -116,7 +117,7 @@ Scans are preprocessed to 64×64×64 voxels with Z-normalization. For preprocess
 python preprocessing_MRI_CT_scans.py --input_dir --output_dir
 ```
 
-Input_dir if the path with the MRI or CT scans and output_dir the path where the preprocessed volumens are going to be saved.
+*Input_dir if the path with the MRI or CT scans and output_dir the path where the preprocessed volumens are going to be saved.*
 ---
 
 ## Training
