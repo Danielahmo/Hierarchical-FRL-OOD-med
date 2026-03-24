@@ -31,9 +31,8 @@ $$x_L = K_\sigma * x, \quad x_H = \text{rgb2gray}(x) - \text{rgb2gray}(x_L)$$
 
 The enriched input $x_F = [x,\, x_L,\, x_H]$ is passed through a VAE–DCGAN encoder-decoder. OOD scoring uses the **Negative Log-Likelihood (NLL)** estimated via importance sampling, and an optional **frequency-based score** $S_F$:
 
-$$S_F(\mathbf{x}) = -\log p_\theta(\mathbf{x}_F) - L(\mathbf{x})$$
+$$NLL(\mathbf{x}) = -\log p_\theta(\mathbf{x}_F) $$
 
-where $L(\mathbf{x})$ is image complexity estimated through lossless compression.
 
 ### Architecture
 
@@ -118,6 +117,8 @@ python preprocessing_MRI_CT_scans.py --input_dir --output_dir
 ```
 
 *Input_dir if the path with the MRI or CT scans and output_dir the path where the preprocessed volumens are going to be saved.*
+
+
 ---
 
 ## Training
