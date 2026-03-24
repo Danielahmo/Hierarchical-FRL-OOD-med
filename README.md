@@ -10,7 +10,9 @@
 
 ## Overview
 
-This repository contains the official implementation of **Hierarchical Frequency Regularization Learning (FRL)** for out-of-distribution (OOD) detection in generative models applied to medical imaging. The method extends the [FRL framework](https://github.com/mu-cai/FRL) by incorporating both **high** and **low frequency** components into a VAE–DCGAN architecture, enabling robust OOD detection across 2D histological images and 3D volumetric medical scans (MRI, CT).
+This repository contains the official implementation of **Hierarchical Frequency Regularization Learning (FRL)** for out-of-distribution (OOD) detection in generative models applied to medical imaging. The method incorporates both **high** and **low frequency** components into a VAE–DCGAN architecture, enabling robust OOD detection across 2D histological images and 3D volumetric medical scans (MRI, CT). Article published on ISBI, 2026.
+
+![model_architecture](https://github.com/Danielahmo/Hierarchical-FRL-OOD-med/blob/main/images_readme/Model_architecture.png)
 
 ### Key Contributions
 
@@ -50,13 +52,13 @@ x_F = [x, x_L, x_H]  ──► Encoder ──► z ~ N(μ, σ²) ──► Decod
 
 ## Results
 
-| Model | Score | cs-ID | Near OOD | Far OOD | SNR 30 | SNR 20 | SNR 10 | Gamma | Motion | Average |
-|---|---|---|---|---|---|---|---|---|---|---|
-| No FRL | NLL | 0.650 | 0.627 | 0.742 | 0.525 | 0.627 | 0.904 | 0.556 | 0.557 | 0.649 |
-| FRL (high) | $S_F$ | 0.997 | 0.928 | 1.000 | 0.989 | 1.000 | 0.998 | 0.623 | 1.000 | 0.942 |
-| FRL (low) | $S_F$ | 0.996 | 0.891 | 1.000 | 0.942 | 0.894 | 0.891 | 0.623 | 0.997 | 0.904 |
-| **FRL (high+low)** | $S_F$ | **0.994** | **0.925** | **1.000** | **1.000** | **1.000** | **0.994** | **0.997** | **1.000** | **0.989** |
-| FRL (HiLo) | $S_F$ | 0.987 | 0.860 | 1.000 | 0.997 | 1.000 | 0.986 | 0.620 | 0.997 | 0.931 |
+| Model | cs-ID | Near OOD | Far OOD | SNR 30 | SNR 20 | SNR 10 | Gamma | Motion | Average |
+|---|---|---|---|---|---|---|---|---|---|
+| No FRL | 0.650 | 0.627 | 0.742 | 0.525 | 0.627 | 0.904 | 0.556 | 0.557 | 0.649 |
+| FRL (high) | 0.877 | 0.892 | 1.000 | 1.000 | 1.000 | 1.000 | 0.546 | 0.899 | 0.902 |
+| FRL (low) | 0.889 | 0.883 | 1.000 | 0.822 | 1.000 | 1.000 | 0.562 | 0.876 | 0.879 |
+| FRL (high+low) | 0.861 | 0.893 | 1.000 | 1.000 | 1.000 | 1.000 | **0.997** | **1.000** | **0.969** |
+| **FRL (HiLo)** | **0.899** | 0.884 | 1.000 | 0.647 | 0.998 | 1.000 | 0.553 | 0.873 | 0.857 |
 
 *AUC performance on MIDOG++ dataset. Each model trained with 5 seeds.*
 
@@ -88,8 +90,9 @@ x_F = [x, x_L, x_H]  ──► Encoder ──► z ~ N(μ, σ²) ──► Decod
 ```bash
 git clone https://github.com/Danielahmo/Hierarchical-FRL-OOD-med.git
 cd Hierarchical-FRL-OOD-med
+pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu128 
 pip install -r requirements.txt
-pip install torch torchvision  # install separately per your CUDA version
+
 ```
 
 **Requirements:** `numpy`, `pandas`, `pillow`, `tqdm`, `torchio`, `opencv-python`
@@ -99,22 +102,21 @@ pip install torch torchvision  # install separately per your CUDA version
 ## Datasets
 
 ### MIDOG++ (2D histology)
-The [MIDOG++](https://midog2022.grand-challenge.org/) dataset contains histological whole-slide images of mitotic cells across 7 tumor types. Preprocessing (50×50 px crops) and OOD splits follow [Aubreville et al.](https://openreview.net/forum?id=...).
-
-Prepare a text file with image paths and labels (space-separated):
-```
-001_1_0.tiff 0
-001_1_2.tiff 1
-...
-```
+The [MIDOG++](https://midog2022.grand-challenge.org/) dataset contains histological whole-slide images of mitotic cells across 7 tumor types. Preprocessing (50×50 px crops) and OOD splits follow [OpeMIBOOD](https://github.com/remic-othr/OpenMIBOOD).
+For details of dowloadinf and preprocessing consult their repository.
 
 ### MOOD Challenge (3D MRI/CT)
-The [MOOD Challenge](http://medicalood.dkfz.de/) dataset includes:
+The [MOOD Challenge](https://www.synapse.org/Synapse:syn21343101/wiki/599515) dataset includes:
 - **Brain MRI**: 800 scans, 256×256×256 voxels
 - **Abdomen CT**: 550 scans, 512×512×512 voxels
 
-Scans are preprocessed to 64×64×64 voxels with Z-normalization.
+Scans are preprocessed to 64×64×64 voxels with Z-normalization. For preprocessing the data run:
 
+```bash
+python preprocessing_MRI_CT_scans.py --input_dir --output_dir
+```
+
+Input_dir if the path with the MRI or CT scans and output_dir the path where the preprocessed volumens are going to be saved.
 ---
 
 ## Training
@@ -160,10 +162,8 @@ python train_3DVAE_freq_2gauss_adjustB.py \
 | `--imageSize` | 64 | Input spatial resolution |
 | `--nz` | 100 | Latent dimension |
 | `--ngf` | 32 | Number of feature maps |
-| `--beta` | 0 (3D) / 1 (2D) | KL weight (β-VAE) |
 | `--gauss_size` | 5 | Gaussian kernel size for frequency decomposition |
 | `--lr` | 3e-4 | Learning rate |
-| `--seed_val` | -1 | Random seed (-1 = random) |
 
 ---
 
