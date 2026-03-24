@@ -29,7 +29,7 @@ Given an input image $x$, the model computes low- and high-frequency components 
 
 $$x_L = K_\sigma * x, \quad x_H = \text{rgb2gray}(x) - \text{rgb2gray}(x_L)$$
 
-The enriched input $x_F = [x,\, x_L,\, x_H]$ is passed through a VAE–DCGAN encoder-decoder. OOD scoring uses the **Negative Log-Likelihood (NLL)** estimated via importance sampling, and an optional **frequency-based score** $S_F$:
+The enriched input $x_F = [x,\, x_L,\, x_H]$ is passed through a VAE–DCGAN encoder-decoder. OOD scoring uses the **Negative Log-Likelihood (NLL)** estimated via importance sampling:
 
 $$NLL(\mathbf{x}) = -\log p_\theta(\mathbf{x}_F) $$
 
